@@ -6,4 +6,3 @@ fun main() {
     val lunch = MenuController.create()
     lunch.pickMenuStart()
 }
-
