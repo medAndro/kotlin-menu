@@ -1,10 +1,10 @@
 package menu.controller
 
+import camp.nextstep.edu.missionutils.Randoms
 import menu.view.MenuView
 import menu.domain.InputValidator
 import menu.domain.MenuService
 import menu.model.Coach
-import menu.model.NumberBasket
 import menu.resources.Messages.*
 
 class MenuController(
@@ -16,6 +16,8 @@ class MenuController(
         menuView.showMessage(MENU_PICK_START_HEADER.message())
         val names = readNamesWithRetry(NAME_INPUT_HEADER.message())
         val coaches = readCoaches(names)
+        val dailyCategories: MutableList<Int> = mutableListOf()
+        dailyCategories.add(dailyCategoryPick(dailyCategories))
     }
 
     private fun readNamesWithRetry(infoMessage: String): List<String> {
@@ -50,6 +52,16 @@ class MenuController(
         }
     }
 
+    private fun dailyCategoryPick(categories: MutableList<Int>): Int {
+        while (true) {
+            val randomVal = Randoms.pickNumberInRange(1, 5)
+            val count = categories.count{ it == randomVal }
+            if (count <= 1){
+                return randomVal
+            }
+        }
+    }
+
     companion object {
         fun create(): MenuController {
             val menuView = MenuView()
@@ -63,5 +75,7 @@ class MenuController(
         val 중식 = listOf("깐풍기", "볶음면", "동파육", "짜장면", "짬뽕", "마파두부", "탕수육", "토마토 달걀볶음", "고추잡채")
         val 아시안 = listOf("팟타이", "카오 팟", "나시고렝", "파인애플 볶음밥", "쌀국수", "똠얌꿍", "반미", "월남쌈", "분짜")
         val 양식 = listOf("라자냐", "그라탱", "뇨끼", "끼슈", "프렌치 토스트", "바게트", "스파게티", "피자", "파니니")
+        val categories: Map<Int, List<String>> = mapOf(1 to 일식, 2 to 한식, 3 to 중식, 4 to 아시안, 5 to 양식)
+        val categoryNames: Map<Int, String> = mapOf(1 to "일식", 2 to "한식", 3 to "중식", 4 to "아시안", 5 to "양식")
     }
 }
