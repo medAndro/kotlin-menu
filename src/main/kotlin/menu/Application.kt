@@ -1,9 +1,9 @@
 package menu
 
-import menu.controller.GameController
+import menu.controller.MenuController
 
 fun main() {
-    val game = GameController.create()
-    game.gameStart()
+    val lunch = MenuController.create()
+    lunch.pickMenuStart()
 }
 

@@ -2,7 +2,7 @@ package menu.domain
 
 import menu.model.NumberBasket
 
-class GameService {
+class MenuService {
     fun plusTwoNumber(numberBasket: NumberBasket): Int {
         return numberBasket.getNumbers().sum()
     }
