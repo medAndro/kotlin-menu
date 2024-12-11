@@ -3,21 +3,20 @@ package menu.controller
 import camp.nextstep.edu.missionutils.Randoms
 import menu.view.MenuView
 import menu.domain.InputValidator
-import menu.domain.MenuService
 import menu.model.Coach
 import menu.resources.Messages.*
+import java.awt.Menu
 
 class MenuController(
     private val menuView: MenuView,
-    private val validator: InputValidator,
-    private val menuService: MenuService
+    private val validator: InputValidator
 ) {
     fun pickMenuStart() {
         menuView.showMessage(MENU_PICK_START_HEADER.message())
         val names = readNamesWithRetry(NAME_INPUT_HEADER.message())
         val coaches = readCoaches(names)
-        val dailyCategories: MutableList<Int> = mutableListOf()
-        dailyCategories.add(dailyCategoryPick(dailyCategories))
+        val categoryIndex = pickMenus(coaches)
+        printMenuResult(coaches, categoryIndex)
     }
 
     private fun readNamesWithRetry(infoMessage: String): List<String> {
@@ -52,22 +51,47 @@ class MenuController(
         }
     }
 
-    private fun dailyCategoryPick(categories: MutableList<Int>): Int {
+    private fun pickMenus(coaches: List<Coach>): List<Int> {
+        val dailyIndexCategories: MutableList<Int> = mutableListOf()
+        for (i in 1 ..5){
+            val todayCategoryIndex = dailyCategoryIndexPick(dailyIndexCategories)
+            dailyIndexCategories.add(todayCategoryIndex)
+            pickDailyMenusInCategory(categories[todayCategoryIndex] ?: listOf(), coaches)
+        }
+        return dailyIndexCategories.toList()
+    }
+
+    private fun dailyCategoryIndexPick(dailyCategories: MutableList<Int>): Int {
         while (true) {
             val randomVal = Randoms.pickNumberInRange(1, 5)
-            val count = categories.count{ it == randomVal }
+            val count = dailyCategories.count{ it == randomVal }
             if (count <= 1){
                 return randomVal
             }
         }
     }
 
+    private fun pickDailyMenusInCategory(categoryFoods: List<String>, coaches: List<Coach>){
+        coaches.forEach { coach ->
+            coach.pickMenu(categoryFoods)
+        }
+    }
+
+    private fun printMenuResult(coaches: List<Coach>, categoryIndex: List<Int>){
+        menuView.showMessage(SUGGEST_RESULT.message())
+        val dailyCategoryNames = categoryIndex.map { categoryNamesByIndex[it]?:"" }
+        menuView.showResultCategoryNames(dailyCategoryNames)
+        coaches.forEach { coach ->
+            menuView.showMessage(coach.getNameWithMenus())
+        }
+        menuView.showMessage(SUGGEST_RESULT_TAIL.message())
+    }
+
     companion object {
         fun create(): MenuController {
             val menuView = MenuView()
             val inputValidator = InputValidator()
-            val menuService = MenuService()
-            return MenuController(menuView, inputValidator, menuService)
+            return MenuController(menuView, inputValidator)
         }
 
         val 일식 = listOf("규동", "우동", "미소시루", "스시", "가츠동", "오니기리", "하이라이스", "라멘", "오코노미야끼")
@@ -76,6 +100,6 @@ class MenuController(
         val 아시안 = listOf("팟타이", "카오 팟", "나시고렝", "파인애플 볶음밥", "쌀국수", "똠얌꿍", "반미", "월남쌈", "분짜")
         val 양식 = listOf("라자냐", "그라탱", "뇨끼", "끼슈", "프렌치 토스트", "바게트", "스파게티", "피자", "파니니")
         val categories: Map<Int, List<String>> = mapOf(1 to 일식, 2 to 한식, 3 to 중식, 4 to 아시안, 5 to 양식)
-        val categoryNames: Map<Int, String> = mapOf(1 to "일식", 2 to "한식", 3 to "중식", 4 to "아시안", 5 to "양식")
+        val categoryNamesByIndex: Map<Int, String> = mapOf(1 to "일식", 2 to "한식", 3 to "중식", 4 to "아시안", 5 to "양식")
     }
 }

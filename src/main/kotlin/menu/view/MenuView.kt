@@ -9,8 +9,9 @@ class MenuView {
     }
 
     // Output Views
-    fun showBlankLine() {
-        println()
+    fun showResultCategoryNames(categoryNames: List<String>) {
+        val joinNames = categoryNames.joinToString(" | ")
+        println("[ 카테고리 | $joinNames ]")
     }
 
     fun showMessage(message: String) {
