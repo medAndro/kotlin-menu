@@ -3,6 +3,7 @@ package menu.controller
 import menu.view.MenuView
 import menu.domain.InputValidator
 import menu.domain.MenuService
+import menu.model.Coach
 import menu.model.NumberBasket
 import menu.resources.Messages.*
 
@@ -12,11 +13,9 @@ class MenuController(
     private val menuService: MenuService
 ) {
     fun pickMenuStart() {
-//        val numberBasket = generateNumberBasket()
         menuView.showMessage(MENU_PICK_START_HEADER.message())
         val names = readNamesWithRetry(NAME_INPUT_HEADER.message())
-        println(names)
-//        announceSumNumbers(numberBasket)
+        val coaches = readCoaches(names)
     }
 
     private fun readNamesWithRetry(infoMessage: String): List<String> {
@@ -32,21 +31,23 @@ class MenuController(
         }
     }
 
-    private fun readNumberWithRetry(infoMessage: String) {
+    private fun readCoaches(names: List<String>): List<Coach> {
+        return names.map { coach ->
+            readBanMenusWithRetry(coach)
+        }
+    }
+
+    private fun readBanMenusWithRetry(name: String): Coach {
         while (true) {
             try {
-                menuView.showMessage(infoMessage)
-                validator.validateInteger(menuView.readLine())
+                menuView.showMessage(BAN_MENU_INPUT_HEADER.formattedMessage(name))
+                val banMenus = menuView.readLine().split(',')
+                validator.validateBanMenus(banMenus)
+                return Coach(name, banMenus)
             } catch (e: IllegalArgumentException) {
                 menuView.showMessage(e.message ?: INVALID_ERROR.errorMessage())
             }
         }
-    }
-
-    private fun announceSumNumbers(numberBasket: NumberBasket) {
-        val expression = menuService.getExpression(numberBasket)
-        val sumValue = menuService.plusTwoNumber(numberBasket)
-        menuView.showMessage(SUM_RESULT.formattedMessage(expression, sumValue))
     }
 
     companion object {

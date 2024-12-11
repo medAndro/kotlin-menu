@@ -19,4 +19,8 @@ class InputValidator {
             require(it.length <= 4) { EMPTY_MAX_NAME.errorMessage() }
         }
     }
+
+    fun validateBanMenus(input: List<String>) {
+        require(input.size <= 2) { EMPTY_MAX_PEOPLE.errorMessage() }
+    }
 }
